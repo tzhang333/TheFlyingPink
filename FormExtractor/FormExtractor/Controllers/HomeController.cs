@@ -1,4 +1,5 @@
-﻿using FormExtractor.Services;
+﻿using FormExtractor.Models;
+using FormExtractor.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,13 +16,24 @@ namespace FormExtractor.Controllers
             return View();
         }
 
+        [Authorize]
         public ActionResult Extract(string type)
         {
-            
+            if(string.IsNullOrEmpty(type))
+            {
+                return RedirectToAction("Index");
+            }
 
-            return View();
+            ViewBag.FormType = type;
+            var vm = new ExtractViewModel();
+            vm.Vendors.Add(new Vendor() { Id = "1200", Name = "Chloride Systems" });
+            vm.Vendors.Add(new Vendor() { Id = "1350", Name = "Excide Industrial Batteries" });
+            vm.Vendors.Add(new Vendor() { Id = "1400", Name = "Coastal Heating of Ottawa" });
+
+            return View(vm);
         }
 
+        [Authorize]
         [HttpPost]
         public ActionResult FileUpload(IEnumerable<HttpPostedFileBase> files)
         {
