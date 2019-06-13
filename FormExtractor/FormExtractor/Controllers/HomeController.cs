@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -35,14 +36,19 @@ namespace FormExtractor.Controllers
 
         [Authorize]
         [HttpPost]
-        public ActionResult FileUpload(IEnumerable<HttpPostedFileBase> files)
+        public async Task<ActionResult> FileUpload(IEnumerable<HttpPostedFileBase> files)
         {
             if (files != null)
             {
+                var tasks = new List<Task>();
                 foreach (HttpPostedFileBase file in files)
                 {
                     FileService.Upload(file);
+
+                    tasks.Add(AzureService.PostFormRecognizer(file.FileName));
                 }
+
+                await Task.WhenAll(tasks);
             }
 
             return RedirectToAction("Extract", new { type = "Invoice" });
