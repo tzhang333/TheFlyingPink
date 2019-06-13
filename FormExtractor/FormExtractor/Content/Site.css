@@ -1,6 +1,11 @@
-﻿body {
+﻿html {
+    height: 100%;
+}
+
+body {
     padding-top: 50px;
     padding-bottom: 20px;
+    height: 100%;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -21,4 +26,18 @@ input,
 select,
 textarea {
     max-width: 280px;
+}
+
+.flex-container {
+    display: flex; /* establish flex container */
+    flex-direction: column; /* make main axis vertical */
+    justify-content: center; /* center items vertically, in this case */
+    align-items: center; /* center items horizontally, in this case */
+    height: 75vh;
+}
+
+.flex-box {
+    width: 300px;
+    margin: 5px;
+    text-align: center; /* will center text in <p>, which is not a flex item */
 }
