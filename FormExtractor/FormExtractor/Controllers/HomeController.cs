@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -15,9 +16,26 @@ namespace FormExtractor.Controllers
 
         public ActionResult Extract(string type)
         {
-            ViewBag.Message = "Your application description page.";
+            
 
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult FileUpload(IEnumerable<HttpPostedFileBase> files)
+        {
+            if (files != null)
+            {
+                foreach (HttpPostedFileBase file in files)
+                {
+                    var memStream = new MemoryStream();
+                    file.InputStream.CopyTo(memStream);
+
+                    byte[] fileData = memStream.ToArray();
+                }
+            }
+
+            return RedirectToAction("Extract", new { type = "Invoice" });
         }
     }
 }

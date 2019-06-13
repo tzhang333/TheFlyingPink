@@ -2,5 +2,44 @@
     ViewBag.Title = "Extract";
 }
 <h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
 
+@Styles.Render("~/Content/dropzone-css")
+
+<div class="row">
+    <form action="/Home/FileUpload" method="post" enctype="multipart/form-data" class="dropzone dz-clickable" style="border:dotted;" id="dropzoneForm" />
+</div>
+<div class="row">
+    <div style="margin-top:15px;">
+        <button type="submit" class="btn btn-sm btn-primary" id="submit">Submit</button>
+    </div>
+</div>
+
+@section scripts {
+    @Scripts.Render("~/bundles/dropzone")
+
+    <script type="text/javascript">
+        Dropzone.options.dropzoneForm = {
+            paramName: "files",
+            autoProcessQueue: false,
+            uploadMultiple: true,
+            maxFilesize: 4,
+            maxFiles: 10,
+            parallelUploads: 10,
+            acceptedFiles: "application/pdf,image/jpeg,image/png",
+            dictMaxFilesExceeded: "Maximum 10 files can be uploaded at once",
+            init: function () {
+                var dz = this;
+                $("#submit").click(function (e) {
+                    if (dz.files.length > 0) {
+                        dz.processQueue();
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                dz.on("complete", function (file) {
+                    dz.removeFile(file);
+                });
+            }
+        };
+    </script>
+}
