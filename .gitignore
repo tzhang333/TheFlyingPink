@@ -6,3 +6,5 @@ Upload
 
 *.user
 *.suo
+*.mdf
+App_Data
