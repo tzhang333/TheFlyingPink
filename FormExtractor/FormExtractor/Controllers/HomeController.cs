@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FormExtractor.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,10 +29,7 @@ namespace FormExtractor.Controllers
             {
                 foreach (HttpPostedFileBase file in files)
                 {
-                    var memStream = new MemoryStream();
-                    file.InputStream.CopyTo(memStream);
-
-                    byte[] fileData = memStream.ToArray();
+                    FileService.Upload(file);
                 }
             }
 
