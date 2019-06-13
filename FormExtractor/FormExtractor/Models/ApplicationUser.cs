@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -19,6 +20,25 @@ namespace FormExtractor.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+        public virtual ApplicationUserInfo ApplicationUserInfo { get; set; }
+    }
+
+    public class ApplicationUserInfo
+    {
+        public int Id { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Display(Name = "Company")]
+        public string Company { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        [Display(Name = "Vendor Number")]
+        public string VendorNumber { get; set; }
     }
 
 }

@@ -23,5 +23,15 @@ namespace FormExtractor.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "Company")]
+        public string Company { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "Vendor Number")]
+        public string VendorNumber { get; set; }
     }
 }

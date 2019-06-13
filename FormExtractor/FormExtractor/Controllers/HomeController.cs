@@ -7,6 +7,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using FormExtractor.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace FormExtractor.Controllers
 {
@@ -25,8 +28,11 @@ namespace FormExtractor.Controllers
                 return RedirectToAction("Index");
             }
 
+            var currentUserId = User.Identity.GetUserId();
+            var manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+            var currentUser = manager.FindById(currentUserId);
             ViewBag.FormType = type;
-            var vm = new ExtractViewModel();
+            var vm = new ExtractViewModel(currentUser);
             vm.Vendors.Add(new Vendor() { Id = "1200", Name = "Chloride Systems" });
             vm.Vendors.Add(new Vendor() { Id = "1350", Name = "Excide Industrial Batteries" });
             vm.Vendors.Add(new Vendor() { Id = "1400", Name = "Coastal Heating of Ottawa" });
