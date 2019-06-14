@@ -7,31 +7,36 @@
 @Styles.Render("~/Content/dropzone-css")
 
 <div class="row">
-    @{
-        if (Model.User.UserName == "ADMIN")
-        {
-            var selectList = new List<SelectListItem>();
-            selectList.Add(new SelectListItem() { Text = "Please select a vendor...", Value = "", Selected = true });
-            foreach (var vendor in Model.Vendors)
+    <div class="col-md-12">
+        @{
+            if (Model.User.UserName == "ADMIN")
             {
-                selectList.Add(new SelectListItem() { Text = vendor.Id + " - " + vendor.Name, Value = vendor.Id });
+                var selectList = new List<SelectListItem>();
+                selectList.Add(new SelectListItem() { Text = "Please select a vendor...", Value = "", Selected = true });
+                foreach (var vendor in Model.Vendors)
+                {
+                    selectList.Add(new SelectListItem() { Text = vendor.Id + " - " + vendor.Name, Value = vendor.Id });
+                }
+                @Html.DropDownList("ddl_vendors", selectList, new { style = "margin-bottom: 15px;" });
             }
-            @Html.DropDownList("ddl_vendors", selectList, new { style = "margin-bottom: 15px;" });
+            else
+            {
+                @Html.LabelFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "col-md-2 control-label" })
+                @Html.TextBoxFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "form-control", @disabled = true })
+            }
         }
-        else
-        {
-            @Html.LabelFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "col-md-2 control-label" })
-            @Html.TextBoxFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "form-control", @disabled = true })
-        }
-    }
-</div>
-
-<div class="row">
-    <form action="/Home/FileUpload" method="post" enctype="multipart/form-data" class="dropzone dz-clickable" style="border:dotted;" id="dropzoneForm" />
+    </div>
 </div>
 <div class="row">
-    <div style="margin-top:15px;">
-        <button type="submit" class="btn btn-sm btn-primary" id="submit">Submit</button>
+    <div class="col-md-12">
+        <form action="/Home/FileUpload" method="post" enctype="multipart/form-data" class="dropzone dz-clickable" style="border:dotted;" id="dropzoneForm" />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div style="margin-top:15px;">
+            <button type="submit" class="btn btn-sm btn-primary" id="submit">Submit</button>
+        </div>
     </div>
 </div>
 
