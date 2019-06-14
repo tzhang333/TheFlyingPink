@@ -17,5 +17,6 @@ namespace FormExtractor.Models
         {
             return new ApplicationDbContext();
         }
+        public System.Data.Entity.DbSet<ApplicationUserInfo> ApplicationUserInfo { get; set; }
     }
 }

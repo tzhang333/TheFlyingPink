@@ -152,7 +152,12 @@ namespace FormExtractor.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email, Email = model.Email,
+                    ApplicationUserInfo = new ApplicationUserInfo
+                        {Company = model.Company, VendorNumber = model.VendorNumber}
+                };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
