@@ -175,6 +175,7 @@
     <Compile Include="Models\ExternalLoginListViewModel.cs" />
     <Compile Include="Models\ExtractViewModel.cs" />
     <Compile Include="Models\ForgotPasswordViewModel.cs" />
+    <Compile Include="Models\AzureInvoice.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
     <Compile Include="Models\ResetPasswordViewModel.cs" />

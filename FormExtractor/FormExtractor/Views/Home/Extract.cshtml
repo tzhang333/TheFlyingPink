@@ -54,6 +54,15 @@
                 dz.on("complete", function (file) {
                     dz.removeFile(file);
                 });
+                dz.on("success", function (file, response) {
+                    var message = response.successCount + " files uploaded successfully.\n";
+                    response.invoices.forEach(function (invoice) {
+                        message += "Invoice Number: " + invoice.Id + " ";
+                        message += " Total: " + invoice.Total.toString() + "\n";
+                    });
+                    
+                    alert(message);
+                });
             }
         };
     </script>
