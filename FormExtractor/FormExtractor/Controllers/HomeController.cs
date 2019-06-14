@@ -73,6 +73,7 @@ namespace FormExtractor.Controllers
         {
             var invoices = new List<AzureInvoice>();
             var successCount = 0;
+            string error = "";
             if (files != null)
             {
                 var user = User.Identity.Name;
@@ -98,7 +99,7 @@ namespace FormExtractor.Controllers
                 foreach(var task in tasks)
                 {
                     var response = task.Result;
-                    var success = (response.StatusCode == System.Net.HttpStatusCode.OK) ? true : false;
+                    var success = response.StatusCode == System.Net.HttpStatusCode.OK;
                     var JSON = await response.Content.ReadAsStringAsync();
 
                     var jo = JObject.Parse(JSON);
@@ -107,7 +108,7 @@ namespace FormExtractor.Controllers
                     /// Insert into Sage 300
                     OpenSession("SAMINC", "ADMIN", "ADMIN");
                     var apInvsrc = ParseForminJSON(JSON);
-                    createAPBatch(apInvsrc.invoiceNo, vendorId, apInvsrc.amounts);
+                    var createSuccess = createAPBatch(apInvsrc.invoiceNo, vendorId, apInvsrc.amounts);
 
                     var invoice = new AzureInvoice()
                     {
@@ -118,9 +119,13 @@ namespace FormExtractor.Controllers
                     };
                     invoices.Add(invoice);
 
-                    if (success)
+                    if (createSuccess)
                     {
                         successCount++;
+                    }
+                    else
+                    {
+                        error = "An invoice with this number already exists for this vendor.  If you want to add this invoice, add characters to the invoice number to make it unique.";
                     }
                 }
             }
@@ -130,24 +135,37 @@ namespace FormExtractor.Controllers
                 invoices,
                 redirectUrl = Url.Action("Extract", new { type = "Invoice" }),
                 successCount,
+                error
             });
         }
-        private APInvSrc ParseForminJSON(String JSON)
+
+        private static APInvSrc ParseForminJSON(string JSON)
         {
             APInvSrc apInv = new APInvSrc();
-            var jo = JObject.Parse(JSON);
-            apInv.invoiceNo = jo["pages"][0]["keyValuePairs"][1]["value"][0]["text"].ToString();
             List<String> amounts = new List<String>();
-            var am = jo["pages"][0]["keyValuePairs"][11]["value"];
-            //var am = jo["pages"][0]["tables"][1]["columns"][5]["entries"].ToArray();
-            foreach (var a in am)
+            var jo = JObject.Parse(JSON);
+            var keyvaluepairs = jo.SelectTokens("pages[0].keyValuePairs");
+
+            foreach (var tok in keyvaluepairs)
             {
-                var abc = a["text"];
-                if (abc != null)
+                var vals = tok.ToArray<JToken>();
+                foreach (var element in vals)
                 {
-                    amounts.Add(abc.ToString());
+                    var context = element["key"][0]["text"];
+                    if (context.ToString() == "Number:")
+                    {
+                        apInv.invoiceNo = element["value"][0]["text"].ToString();
+                    }
+                    if (context.ToString() == "Amount")
+                    {
+                        foreach (var amt in element["value"])
+                        {
+                            amounts.Add(amt["text"].ToString());
+                        }
+                    }
                 }
             }
+
             apInv.amounts = amounts;
 
             return apInv;
@@ -170,7 +188,7 @@ namespace FormExtractor.Controllers
             dblink = AccpacSession.OpenDBLink(DBLinkType.Company, DBLinkFlags.ReadWrite);
             return 0;
         }
-        private int createAPBatch(string invNo, string vendorNo, List<string> amounts)
+        private bool createAPBatch(string invNo, string vendorNo, List<string> amounts)
         {
             try
             {
@@ -256,10 +274,10 @@ namespace FormExtractor.Controllers
             }
             catch (Exception e)
             {
-
+                return false;
             }
 
-            return 0;
+            return true;
         }
 
         private View OpenView(string sViewID)

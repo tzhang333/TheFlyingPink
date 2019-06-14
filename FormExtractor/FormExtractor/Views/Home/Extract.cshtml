@@ -55,34 +55,39 @@
             parallelUploads: 10,
             acceptedFiles: "application/pdf,image/jpeg,image/png",
             dictMaxFilesExceeded: "Maximum 10 files can be uploaded at once",
-            init: function () {
+            init: function() {
                 var dz = this;
-                $("#submit").click(function (e) {
+                $("#submit").click(function(e) {
                     if ($("#ddl_vendors").val() === "") {
                         alert("You must select a vendor first!");
-                    }
-                    else if (dz.files.length > 0) {
+                    } else if (dz.files.length > 0) {
                         dz.processQueue();
                     }
                     e.preventDefault();
                     e.stopPropagation();
                 });
-                dz.on("complete", function (file) {
-                    dz.removeFile(file);
-                });
-                dz.on("success", function (file, response) {
-                    var message = response.successCount + " files uploaded successfully.\n";
-                    response.invoices.forEach(function (invoice) {
-                        message += "Invoice Number: " + invoice.Id + " ";
-                        message += " Total: " + invoice.Total.toString() + "\n";
+                dz.on("complete",
+                    function(file) {
+                        dz.removeFile(file);
                     });
-                    
-                    alert(message);
+                dz.on("success", function(file, response) {
+                    if (response.successCount > 0) {
+                        var message = response.successCount + " files uploaded successfully.\n";
+                        response.invoices.forEach(function(invoice) {
+                            message += "Invoice Number: " + invoice.Id + " ";
+                            message += " Total: " + invoice.Total.toString() + "\n";
+                        });
+
+                        alert(message);
+                    } else {
+                        alert(response.error);
+                    }
                 });
-                dz.on("sending", function (file, xhr, formData) {
-                    var vendor = $("#ddl_vendors").val();
-                    formData.append("vendorId", vendor);
-                });
+                dz.on("sending",
+                    function(file, xhr, formData) {
+                        var vendor = $("#ddl_vendors").val();
+                        formData.append("vendorId", vendor);
+                    });
             }
         };
     </script>
