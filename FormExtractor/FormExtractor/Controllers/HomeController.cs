@@ -69,7 +69,7 @@ namespace FormExtractor.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult> FileUpload(IEnumerable<HttpPostedFileBase> files)
+        public async Task<ActionResult> FileUpload(IEnumerable<HttpPostedFileBase> files, string vendorId)
         {
             var invoices = new List<AzureInvoice>();
             var successCount = 0;
@@ -98,7 +98,7 @@ namespace FormExtractor.Controllers
                     /// Insert into Sage 300
                     OpenSession("SAMINC", "ADMIN", "ADMIN");
                     var apInvsrc = ParseForminJSON(JSON);
-                    createAPBatch(apInvsrc.invoiceNo, "1200", apInvsrc.amounts);
+                    createAPBatch(apInvsrc.invoiceNo, vendorId, apInvsrc.amounts);
 
                     var invoice = new AzureInvoice()
                     {

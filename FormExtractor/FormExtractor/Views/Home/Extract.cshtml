@@ -72,6 +72,10 @@
                     
                     alert(message);
                 });
+                dz.on("sending", function (file, xhr, formData) {
+                    var vendor = $("#ddl_vendors").val();
+                    formData.append("vendorId", vendor);
+                });
             }
         };
     </script>
