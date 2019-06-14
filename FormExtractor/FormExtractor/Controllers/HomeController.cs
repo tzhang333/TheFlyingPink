@@ -129,10 +129,11 @@ namespace FormExtractor.Controllers
             var jo = JObject.Parse(JSON);
             apInv.invoiceNo = jo["pages"][0]["keyValuePairs"][1]["value"][0]["text"].ToString();
             List<String> amounts = new List<String>();
-            var am = jo["pages"][0]["tables"][1]["columns"][5]["entries"].ToArray();
+            var am = jo["pages"][0]["keyValuePairs"][11]["value"];
+            //var am = jo["pages"][0]["tables"][1]["columns"][5]["entries"].ToArray();
             foreach (var a in am)
             {
-                var abc = a[0]["text"];
+                var abc = a["text"];
                 if (abc != null)
                 {
                     amounts.Add(abc.ToString());
@@ -162,85 +163,92 @@ namespace FormExtractor.Controllers
         }
         private int createAPBatch(string invNo, string vendorNo, List<string> amounts)
         {
-            View AP0020 = OpenView("AP0020"); //Invoice Batches
-            View AP0021 = OpenView("AP0021"); //Invoice
-            View AP0022 = OpenView("AP0022"); //Invoice Details
-            View AP0023 = OpenView("AP0023"); //Payment Schedule
-            View AP0402 = OpenView("AP0402"); //Invoice Optional Fields
-            View AP0401 = OpenView("AP0401"); //Invoice Detail Optional field
-
-            View[] v1 = new View[1];
-            v1[0] = AP0021;
-            AP0020.Compose(v1);
-
-            View[] v2 = new View[4];
-            v2[0] = AP0020;
-            v2[1] = AP0022;
-            v2[2] = AP0023;
-            v2[3] = AP0402;
-            AP0021.Compose(v2);
-
-            View[] v3 = new View[3];
-            v3[0] = AP0021;
-            v3[1] = AP0020;
-            v3[2] = AP0401;
-            AP0022.Compose(v3);
-
-            View[] v4 = new View[1];
-            v4[0] = AP0021;
-            AP0023.Compose(v4);
-
-            View[] v5 = new View[1];
-            v5[0] = AP0021;
-            AP0402.Compose(v5);
-
-            View[] v6 = new View[1];
-            v6[0] = AP0022;
-            AP0401.Compose(v6);
-
-            AP0020.RecordCreate(ViewRecordCreate.Insert);
-            AP0020.Fields.FieldByName("PROCESSCMD").SetValue(1, false);
-            AP0020.Process();
-
-            AP0020.Read(false);
-            AP0021.RecordCreate(ViewRecordCreate.NoInsert);
-            AP0022.Cancel();
-            AP0021.Fields.FieldByName("IDVEND").SetValue(vendorNo, false);
-            AP0021.Fields.FieldByName("PROCESSCMD").SetValue(7, false);
-            AP0021.Process();
-
-            AP0021.Fields.FieldByName("PROCESSCMD").SetValue(7, false);
-            AP0021.Process();
-
-            AP0021.Fields.FieldByName("PROCESSCMD").SetValue(4, false);
-            AP0021.Process();
-
-            AP0022.Fields.FieldByName("CNTLINE").SetValue(-1, false);
-            AP0022.Read(false);
-            AP0022.Delete();
-            //AP0022.Fields.FieldByName("AMTDIST").SetValue(777.55, false);
-            //AP0022.Update();
-
-            //AP0022.Fields.FieldByName("CNTLINE").SetValue(-1, false);
-            //AP0022.Read(false);
-            foreach (var amount in amounts)
+            try
             {
-                AP0022.RecordCreate(ViewRecordCreate.DelayKey);
-                AP0022.Fields.FieldByName("PROCESSCMD").SetValue(0, false);
-                AP0022.Process();
-                AP0022.Fields.FieldByName("IDDIST").SetValue("AMEX", false);
-                AP0022.Fields.FieldByName("AMTDIST").SetValue(amount, false);
-                AP0022.Insert();
+                View AP0020 = OpenView("AP0020"); //Invoice Batches
+                View AP0021 = OpenView("AP0021"); //Invoice
+                View AP0022 = OpenView("AP0022"); //Invoice Details
+                View AP0023 = OpenView("AP0023"); //Payment Schedule
+                View AP0402 = OpenView("AP0402"); //Invoice Optional Fields
+                View AP0401 = OpenView("AP0401"); //Invoice Detail Optional field
+
+                View[] v1 = new View[1];
+                v1[0] = AP0021;
+                AP0020.Compose(v1);
+
+                View[] v2 = new View[4];
+                v2[0] = AP0020;
+                v2[1] = AP0022;
+                v2[2] = AP0023;
+                v2[3] = AP0402;
+                AP0021.Compose(v2);
+
+                View[] v3 = new View[3];
+                v3[0] = AP0021;
+                v3[1] = AP0020;
+                v3[2] = AP0401;
+                AP0022.Compose(v3);
+
+                View[] v4 = new View[1];
+                v4[0] = AP0021;
+                AP0023.Compose(v4);
+
+                View[] v5 = new View[1];
+                v5[0] = AP0021;
+                AP0402.Compose(v5);
+
+                View[] v6 = new View[1];
+                v6[0] = AP0022;
+                AP0401.Compose(v6);
+
+                AP0020.RecordCreate(ViewRecordCreate.Insert);
+                AP0020.Fields.FieldByName("PROCESSCMD").SetValue(1, false);
+                AP0020.Process();
+
+                AP0020.Read(false);
+                AP0021.RecordCreate(ViewRecordCreate.NoInsert);
+                AP0022.Cancel();
+                AP0021.Fields.FieldByName("IDVEND").SetValue(vendorNo, false);
+                AP0021.Fields.FieldByName("PROCESSCMD").SetValue(7, false);
+                AP0021.Process();
+
+                AP0021.Fields.FieldByName("PROCESSCMD").SetValue(7, false);
+                AP0021.Process();
+
+                AP0021.Fields.FieldByName("PROCESSCMD").SetValue(4, false);
+                AP0021.Process();
+
+                AP0022.Fields.FieldByName("CNTLINE").SetValue(-1, false);
+                AP0022.Read(false);
+                AP0022.Delete();
+                //AP0022.Fields.FieldByName("AMTDIST").SetValue(777.55, false);
+                //AP0022.Update();
+
+                //AP0022.Fields.FieldByName("CNTLINE").SetValue(-1, false);
+                //AP0022.Read(false);
+                foreach (var amount in amounts)
+                {
+                    AP0022.RecordCreate(ViewRecordCreate.DelayKey);
+                    AP0022.Fields.FieldByName("PROCESSCMD").SetValue(0, false);
+                    AP0022.Process();
+                    AP0022.Fields.FieldByName("IDDIST").SetValue("AMEX", false);
+                    AP0022.Fields.FieldByName("AMTDIST").SetValue(amount, false);
+                    AP0022.Insert();
+                }
+
+                Decimal distAmount = (Decimal) AP0021.Fields.FieldByName("AMTUNDISTR").Value;
+                AP0021.Fields.FieldByName("AMTGROSTOT").SetValue(Decimal.Negate(distAmount), false);
+                AP0021.Fields.FieldByName("IDINVC").SetValue(invNo, false);
+                AP0021.Insert();
+
+                AP0021.Fields.FieldByName("PROCESSCMD").SetValue(7, false);
+                AP0021.Process();
+                AP0020.Read(false);
             }
+            catch (Exception e)
+            {
 
-            Decimal distAmount = (Decimal)AP0021.Fields.FieldByName("AMTUNDISTR").Value;
-            AP0021.Fields.FieldByName("AMTGROSTOT").SetValue(Decimal.Negate(distAmount), false);
-            AP0021.Fields.FieldByName("IDINVC").SetValue(invNo, false);
-            AP0021.Insert();
-
-            AP0021.Fields.FieldByName("PROCESSCMD").SetValue(7, false);
-            AP0021.Process();
-            AP0020.Read(false);
+            }
 
             return 0;
         }
