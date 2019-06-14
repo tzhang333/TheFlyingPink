@@ -23,8 +23,7 @@ namespace FormExtractor.Services
             // Configure validation logic for usernames
             manager.UserValidator = new UserValidator<ApplicationUser>(manager)
             {
-                AllowOnlyAlphanumericUserNames = false,
-                RequireUniqueEmail = true
+                AllowOnlyAlphanumericUserNames = false
             };
 
             // Configure validation logic for passwords
@@ -60,6 +59,12 @@ namespace FormExtractor.Services
             {
                 manager.UserTokenProvider =
                     new DataProtectorTokenProvider<ApplicationUser>(dataProtectionProvider.Create("ASP.NET Identity"));
+            }
+
+            if (manager.Users.All(x => x.UserName != "ADMIN"))
+            {
+                var user = new ApplicationUser() { UserName = "ADMIN" };
+                manager.Create(user, "ADMIN");
             }
             return manager;
         }
