@@ -75,6 +75,15 @@ namespace FormExtractor.Controllers
             var successCount = 0;
             if (files != null)
             {
+                var user = User.Identity.Name;
+                if (user != "ADMIN")
+                {
+                    var currentUserId = User.Identity.GetUserId();
+                    var manager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
+                    var currentUser = manager.FindById(currentUserId);
+                    vendorId = currentUser.ApplicationUserInfo.VendorNumber;
+                }
+
                 var tasks = new List<Task<HttpResponseMessage>>();
                 foreach (HttpPostedFileBase file in files)
                 {

@@ -17,12 +17,14 @@
                 {
                     selectList.Add(new SelectListItem() { Text = vendor.Id + " - " + vendor.Name, Value = vendor.Id });
                 }
-                @Html.DropDownList("ddl_vendors", selectList, new { style = "margin-bottom: 15px;" });
+                @Html.DropDownList("ddl_vendors", selectList, new { @class = "form-control", style = "margin-bottom: 15px;" });
             }
             else
             {
-                @Html.LabelFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "col-md-2 control-label" })
-                @Html.TextBoxFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "form-control", @disabled = true })
+                <div class="form-group">
+                    @Html.LabelFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "col-md-2 control-label" })
+                    @Html.TextBoxFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "form-control", @disabled = true })
+                </div>
             }
         }
     </div>
