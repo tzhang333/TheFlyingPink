@@ -19,6 +19,13 @@ namespace FormExtractor.Controllers
 {
     public class HomeController : Controller
     {
+        private WebApiService _service;
+
+        public HomeController()
+        {
+            _service = new WebApiService();
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -40,12 +47,16 @@ namespace FormExtractor.Controllers
 
             if (currentUser.UserName == "ADMIN")
             {
+                var allVendors = _service.GetVendors("SAMINC");
+
                 var dbContext = new ApplicationDbContext();
                 var users = dbContext.Users.Where(x => x.UserName != "ADMIN");
                 List<Vendor> vendorList = new List<Vendor>();
                 foreach (var vendor in users)
                 {
-                    vendorList.Add(new Vendor{Id = manager.FindById(vendor.Id).ApplicationUserInfo.VendorNumber});
+                    var vendorId = manager.FindById(vendor.Id).ApplicationUserInfo.VendorNumber;
+                    var vendorName = allVendors.Where(x => x.Id == vendorId).Select(x => x.Name).FirstOrDefault();
+                    vendorList.Add(new Vendor{Id = vendorId, Name = vendorName });
                 }
                 vm.Vendors = vendorList;
             }

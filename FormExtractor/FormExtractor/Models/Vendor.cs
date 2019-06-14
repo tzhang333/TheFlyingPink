@@ -11,4 +11,11 @@ namespace FormExtractor.Models
 
         public string Name { get; set; }
     }
+
+    public class SageVendor
+    {
+        public string VendorNumber { get; set; }
+
+        public string VendorName { get; set; }
+    }
 }
