@@ -7,31 +7,38 @@
 @Styles.Render("~/Content/dropzone-css")
 
 <div class="row">
-    @{
-        if (Model.User.UserName == "ADMIN")
-        {
-            var selectList = new List<SelectListItem>();
-            selectList.Add(new SelectListItem() { Text = "Please select a vendor...", Value = "", Selected = true });
-            foreach (var vendor in Model.Vendors)
+    <div class="col-md-12">
+        @{
+            if (Model.User.UserName == "ADMIN")
             {
-                selectList.Add(new SelectListItem() { Text = vendor.Id + " - " + vendor.Name, Value = vendor.Id });
+                var selectList = new List<SelectListItem>();
+                selectList.Add(new SelectListItem() { Text = "Please select a vendor...", Value = "", Selected = true });
+                foreach (var vendor in Model.Vendors)
+                {
+                    selectList.Add(new SelectListItem() { Text = vendor.Id + " - " + vendor.Name, Value = vendor.Id });
+                }
+                @Html.DropDownList("ddl_vendors", selectList, new { @class = "form-control", style = "margin-bottom: 15px;" });
             }
-            @Html.DropDownList("ddl_vendors", selectList, new { style = "margin-bottom: 15px;" });
+            else
+            {
+                <div class="form-group">
+                    @Html.LabelFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "col-md-2 control-label" })
+                    @Html.TextBoxFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "form-control", @disabled = true })
+                </div>
+            }
         }
-        else
-        {
-            @Html.LabelFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "col-md-2 control-label" })
-            @Html.TextBoxFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "form-control", @disabled = true })
-        }
-    }
-</div>
-
-<div class="row">
-    <form action="/Home/FileUpload" method="post" enctype="multipart/form-data" class="dropzone dz-clickable" style="border:dotted;" id="dropzoneForm" />
+    </div>
 </div>
 <div class="row">
-    <div style="margin-top:15px;">
-        <button type="submit" class="btn btn-sm btn-primary" id="submit">Submit</button>
+    <div class="col-md-12">
+        <form action="/Home/FileUpload" method="post" enctype="multipart/form-data" class="dropzone dz-clickable" style="border:dotted;" id="dropzoneForm" />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div style="margin-top:15px;">
+            <button type="submit" class="btn btn-sm btn-primary" id="submit">Submit</button>
+        </div>
     </div>
 </div>
 
@@ -48,30 +55,39 @@
             parallelUploads: 10,
             acceptedFiles: "application/pdf,image/jpeg,image/png",
             dictMaxFilesExceeded: "Maximum 10 files can be uploaded at once",
-            init: function () {
+            init: function() {
                 var dz = this;
-                $("#submit").click(function (e) {
+                $("#submit").click(function(e) {
                     if ($("#ddl_vendors").val() === "") {
                         alert("You must select a vendor first!");
-                    }
-                    else if (dz.files.length > 0) {
+                    } else if (dz.files.length > 0) {
                         dz.processQueue();
                     }
                     e.preventDefault();
                     e.stopPropagation();
                 });
-                dz.on("complete", function (file) {
-                    dz.removeFile(file);
-                });
-                dz.on("success", function (file, response) {
-                    var message = response.successCount + " files uploaded successfully.\n";
-                    response.invoices.forEach(function (invoice) {
-                        message += "Invoice Number: " + invoice.Id + " ";
-                        message += " Total: " + invoice.Total.toString() + "\n";
+                dz.on("complete",
+                    function(file) {
+                        dz.removeFile(file);
                     });
-                    
-                    alert(message);
+                dz.on("success", function(file, response) {
+                    if (response.successCount > 0) {
+                        var message = response.successCount + " files uploaded successfully.\n";
+                        response.invoices.forEach(function(invoice) {
+                            message += "Invoice Number: " + invoice.Id + " ";
+                            message += " Total: " + invoice.Total.toString() + "\n";
+                        });
+
+                        alert(message);
+                    } else {
+                        alert(response.error);
+                    }
                 });
+                dz.on("sending",
+                    function(file, xhr, formData) {
+                        var vendor = $("#ddl_vendors").val();
+                        formData.append("vendorId", vendor);
+                    });
             }
         };
     </script>
