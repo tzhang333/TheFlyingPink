@@ -3,6 +3,7 @@ using FormExtractor.Services;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -12,6 +13,7 @@ using System.Web.Mvc;
 using FormExtractor.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using WebGrease.Css.Extensions;
 
 namespace FormExtractor.Controllers
 {
@@ -35,9 +37,18 @@ namespace FormExtractor.Controllers
             var currentUser = manager.FindById(currentUserId);
             ViewBag.FormType = type;
             var vm = new ExtractViewModel(currentUser);
-            vm.Vendors.Add(new Vendor() { Id = "1200", Name = "Chloride Systems" });
-            vm.Vendors.Add(new Vendor() { Id = "1350", Name = "Excide Industrial Batteries" });
-            vm.Vendors.Add(new Vendor() { Id = "1400", Name = "Coastal Heating of Ottawa" });
+
+            if (currentUser.UserName == "ADMIN")
+            {
+                var dbContext = new ApplicationDbContext();
+                var users = dbContext.Users.Where(x => x.UserName != "ADMIN");
+                List<Vendor> vendorList = new List<Vendor>();
+                foreach (var vendor in users)
+                {
+                    vendorList.Add(new Vendor{Id = manager.FindById(vendor.Id).ApplicationUserInfo.VendorNumber});
+                }
+                vm.Vendors = vendorList;
+            }
 
             return View(vm);
         }

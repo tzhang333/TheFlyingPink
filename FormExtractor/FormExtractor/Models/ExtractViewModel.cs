@@ -8,7 +8,7 @@ namespace FormExtractor.Models
     public class ExtractViewModel
     {
         public ExtractViewModel()
-        {;
+        {
             Vendors = new List<Vendor>();
         }
 
