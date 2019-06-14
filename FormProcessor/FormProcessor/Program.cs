@@ -17,10 +17,7 @@ namespace FormProcessor
         static void Main(string[] args)
         {
             OpenSession("SAMINC", "ADMIN", "ADMIN");
-            //createAPBatch();
-            // var data = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(@"ARDINVO5.json"));
-            //string number = (string)data["Number"];
-            //JsonTextReader reader = new JsonTextReader(new );
+            /*
             var jo = JObject.Parse(File.ReadAllText(@"ARDINVO5.json"));
             var invNo = jo["pages"][0]["keyValuePairs"][1]["value"][0]["text"];
             List<String> amounts = new List<String>();
@@ -33,9 +30,30 @@ namespace FormProcessor
                     amounts.Add(abc.ToString());
                 }
             }
-            createAPBatch(invNo.ToString(), "1200", amounts);
+            */
+            var apInvsrc = ParseForminJSON("ARDINVO5.json");
+            createAPBatch(apInvsrc.invoiceNo, "1200", apInvsrc.amounts);
+            //createAPBatch(invNo.ToString(), "1200", amounts);
         }
-
+        
+        public static APInvSrc ParseForminJSON (String fileName)
+        {
+            APInvSrc apInv = new APInvSrc();
+            var jo = JObject.Parse(File.ReadAllText(fileName));
+            apInv.invoiceNo = jo["pages"][0]["keyValuePairs"][1]["value"][0]["text"].ToString();
+            List<String> amounts = new List<String>();
+            var am = jo["pages"][0]["tables"][1]["columns"][5]["entries"].ToArray();
+            foreach (var a in am)
+            {
+                var abc = a[0]["text"];
+                if (abc != null)
+                {
+                    amounts.Add(abc.ToString());
+                }
+            }
+            apInv.amounts = amounts;
+            return apInv;
+        }
         public static int OpenSession(string sOrgID, string sUserID, string sPassword)
         {
             AccpacSession = new ACCPAC.Advantage.Session();
@@ -130,7 +148,8 @@ namespace FormProcessor
                 AP0022.Insert();
             }
 
-
+            Decimal distAmount = (Decimal)AP0021.Fields.FieldByName("AMTUNDISTR").Value;
+            AP0021.Fields.FieldByName("AMTGROSTOT").SetValue(Decimal.Negate(distAmount), false);
             AP0021.Fields.FieldByName("IDINVC").SetValue(invNo, false);
             AP0021.Insert();
 
