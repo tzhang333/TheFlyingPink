@@ -48,10 +48,10 @@ namespace FormExtractor.Controllers
             ViewBag.FormType = type;
             var vm = new ExtractViewModel(currentUser);
 
+            var allVendors = _service.GetVendors("SAMINC");
+
             if (currentUser.UserName == "ADMIN")
             {
-                var allVendors = _service.GetVendors("SAMINC");
-
                 var dbContext = new ApplicationDbContext();
                 var users = dbContext.Users.Where(x => x.UserName != "ADMIN");
                 List<Vendor> vendorList = new List<Vendor>();
@@ -62,6 +62,12 @@ namespace FormExtractor.Controllers
                     vendorList.Add(new Vendor{Id = vendorId, Name = vendorName });
                 }
                 vm.Vendors = vendorList;
+            }
+            else
+            {
+                var currVenNo = currentUser.ApplicationUserInfo.VendorNumber;
+                var currVenName = allVendors.Where(x => x.Id == currVenNo).Select(x => x.Name).FirstOrDefault();
+                vm.Vendors.Add(new Vendor { Id = currVenNo, Name = currVenName });
             }
 
             return View(vm);

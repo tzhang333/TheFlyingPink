@@ -9,23 +9,16 @@
 <div class="row">
     <div class="col-md-12">
         @{
+            var selectList = new List<SelectListItem>();
             if (Model.User.UserName == "ADMIN")
             {
-                var selectList = new List<SelectListItem>();
                 selectList.Add(new SelectListItem() { Text = "Please select a vendor...", Value = "", Selected = true });
-                foreach (var vendor in Model.Vendors)
-                {
-                    selectList.Add(new SelectListItem() { Text = vendor.Id + " - " + vendor.Name, Value = vendor.Id });
-                }
-                @Html.DropDownList("ddl_vendors", selectList, new { @class = "form-control", style = "margin-bottom: 15px;" });
             }
-            else
+            foreach (var vendor in Model.Vendors)
             {
-                <div class="form-group">
-                    @Html.LabelFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "col-md-2 control-label" })
-                    @Html.TextBoxFor(m => m.User.ApplicationUserInfo.VendorNumber, new { @class = "form-control", @disabled = true })
-                </div>
+                selectList.Add(new SelectListItem() { Text = vendor.Id + " - " + vendor.Name, Value = vendor.Id });
             }
+            @Html.DropDownList("ddl_vendors", selectList, new { @class = "form-control", style = "margin-bottom: 15px;" });
         }
     </div>
 </div>
@@ -75,7 +68,7 @@
                         var message = response.successCount + " files uploaded successfully.\n";
                         response.invoices.forEach(function(invoice) {
                             message += "Invoice Number: " + invoice.Id + " ";
-                            message += " Total: " + invoice.Total.toString() + "\n";
+                            //message += " Total: " + invoice.Total.toString() + "\n";
                         });
 
                         alert(message);

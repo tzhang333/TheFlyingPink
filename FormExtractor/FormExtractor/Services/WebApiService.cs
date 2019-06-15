@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Script.Serialization;
 using Newtonsoft.Json.Linq;
-using Sage.CA.SBS.ERP.Sage300.AP.WebApi.Models;
 using Vendor = FormExtractor.Models.Vendor;
 
 namespace FormExtractor.Services
@@ -103,13 +102,10 @@ namespace FormExtractor.Services
         /// <param name="company"></param>
         /// <param name="model"></param>
         /// <returns></returns>
-        public bool hahaha(string company, InvoiceBatch model)
+        public bool hahaha(string company)
         {
             var url = string.Format("{0}{1}/AP/APInvoiceBatches", _baseUrl, company);
             var request = new RestRequest(url, Method.POST);
-            var invoiceBatch = new InvoiceBatch();
-
-
 
             var ppp = @"{
                 'BatchNumber': 0,
